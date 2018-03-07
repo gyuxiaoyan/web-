@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" id="viewport" />
+	<title>Document</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		body{
+			background: #000;
+		}
+		ul{
+			list-style: none;
+		}
+		li{
+			overflow: hidden;
+			float: left;
+			border-right: 2px solid #fff;
+			border-bottom: 2px solid #fff;
+		}
+		li:nth-child(4n){
+			border-right: none;
+		}
+		
+	</style>
+</head>
+<body>
+	<ul class="container" id="container">
+		<!-- <li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li>
+		<li><img src="img/1.jpg" alt=""></li> -->
+	</ul>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+	<script>
+		var total=17;
+		// 获取设备
+		var zWin=$(window);
+		var render=function(){
+			// 设置图片边框宽度
+			var padding=2;
+			// 获取设备宽度
+			var winWidth= zWin.width();
+			// 计算单张图片宽度
+			var picWidth=Math.floor((winWidth-padding*3)/4);
+			// 定义临时变量接收动态加载的图片
+			var tmp='';
+			for(var i=1;i<=total;i++){
+				var imgSrc='img/'+i+'.jpg';
+				tmp +='<li class="animated bounceIn" style="width:'+picWidth+'px;height:'+picWidth+'px;"><canvas id="cvs_'+i+'"></canvas></li>';
+				var imageObj=new Image();
+				imageObj.index=i;
+				imageObj.onload=function(){
+					// console.log($('#cvs_'+this.index)[0]);
+					// $('#cvs_'+this.index)获取到的是一个数组，数组的第一个值才是所要的选择器
+					var cvs=$('#cvs_'+this.index)[0].getContext("2d");
+					cvs.width=this.width;
+					cvs.height=this.height;
+					cvs.drawImage(this, 0, 0);
+				}
+				imageObj.src=imgSrc;
+				
+			}
+			$("#container").html(tmp);
+		}
+		render();
+		
+
+	</script>
+</body>
+</html>

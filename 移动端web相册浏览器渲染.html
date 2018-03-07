@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" id="viewport" />
+	<title>Document</title>
+	<link rel="stylesheet" style="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+	<style>
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		body{
+			background: #000;
+		}
+		ul{
+			list-style: none;
+		}
+		li{
+			overflow: hidden;
+			float: left;
+			box-sizing: border-box;
+			border: 1px solid #fff;
+		}
+		.large_container{
+			position: absolute;
+			left:0;
+			top:0;
+			width: 100%;
+			height: 100%;
+			display: none;
+			background: #000;
+		}
+		img{
+			display:inline-block;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<ul class="container" id="container">
+	</ul>
+	<div class="large_container animated fadeIn" id="large_container">
+		<img id="large_img">
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+	<script src="zepto/src/touch.js"></script>
+	<script>
+		var total=17;
+		// 获取设备
+		var zWin=$(window);
+		var render=function(){
+			// 获取设备宽度
+			var winWidth= zWin.width();
+			// 计算单张图片宽度
+			var picWidth=winWidth/4;
+			// 定义临时变量接收动态加载的图片
+			var tmp='';
+			for(var i=1;i<=total;i++){
+				var imgSrc='img/'+i+'.jpg';
+				tmp +='<li data-id="'+i+'" class="animated bounceIn" style="width:'+picWidth+'px;height:'+picWidth+'px;"><img src="'+imgSrc+'" alt=""></li>';
+				
+			}
+			$("#container").html(tmp);
+		}
+		render();
+		// 获取大图
+		var lImage=$('#large_img');
+		// 获取大图的dom
+		var domImage=lImage[0];
+		// 加载大图
+		var loadImg=function(id,callback){
+			// 大图容器样式
+			$('#large_container').css({
+				width:zWin.width(),
+				height:zWin.height()
+			}).show();
+			// 大图路径
+			var imgSrc='img/'+id+'.large.jpg';
+			var imageObj=new Image();
+			imageObj.onload=function(){
+				var w=this.width;
+				var h=this.height;
+				var winWidth=zWin.width();
+				var winHeight=zWin.height();
+				// 图片展示宽度
+				var realw=winHeight*w/h;
+				var realH=winWidth*h/w;
+				var paddleft=(winWidth - winHeight*w/h)/2;
+				var paddTop=(winHeight - winWidth*h/w)/2;
+				// 判断是横图还是竖图
+				// 竖图
+				// 图片宽高自适应
+				lImage.css('width','auto').css('height','auto');
+				if(h/w>winHeight/winWidth){
+					lImage.attr('src',imgSrc)
+					.css('height',winHeight)
+					.css('padding-left',paddleft+'px');
+				}else{
+					lImage.attr('src',imgSrc)
+					.css('width',winWidth)
+					.css('padding-top',paddTop+'px');
+				}
+				callback&&callback();
+			}
+			imageObj.src=imgSrc;
+		}
+		// 事件代理（实现点击小图弹出相应大图）
+		// 必须加上touch.js才能生效
+		var idx;//记录当前打开的图片，前后翻页提供依据
+		$('#container').delegate('li','touchend',function(){
+			idx=$(this).attr('data-id');
+			loadImg(idx);
+		});
+		$('#large_container').tap(function(){
+			$(this).hide();
+		}).swipeLeft(function(){
+			idx++;
+			if(idx>total){
+				idx=total;
+			}
+			loadImg(idx,function(){
+				// 动画结束之后需要取消添加的动画类名，否则动画会一直持续，其它图片看不到效果
+				domImage.addEventListener('webkitAnimationEnd',function(){
+					lImage.removeClass('animated bounceInRight');
+					// 完成之后就不用继续监听了，需要第二个参数；不移除不影响效果
+					domImage.removeEventListener('webkitAnimationEnd',arguments.callee);
+				},false);
+				lImage.addClass('animated bounceInRight');
+			});
+			// console.log(idx);
+		}).swipeRight(function(){
+			idx--;
+			if(idx<1){
+				idx=1;
+			}
+			loadImg(idx,function(){
+				domImage.addEventListener('webkitAnimationEnd',function(){
+					lImage.removeClass('animated bounceInLeft');
+					// // 完成之后就不用继续监听了
+					domImage.removeEventListener('webkitAnimationEnd',arguments.callee);
+				},false);
+				lImage.addClass('animated bounceInLeft');
+			});
+			// console.log(idx);
+		})
+	</script>
+</body>
+</html>
